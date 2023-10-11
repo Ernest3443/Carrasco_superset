@@ -1,0 +1,150 @@
+version: '3.3'
+
+networks:
+  business-intelligence-net:
+    driver: bridge
+
+volumes:
+    grafana_data: {}
+
+services:
+
+## --------------------------------------------- DASHBOARD SECTION --------------------------------------------
+  # Container Grafana
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    user: "0"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+    environment:
+      - GF_AUTH_DISABLE_LOGIN_FORM=false
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+    restart: unless-stopped
+    links:
+      - postgres
+    ports: 
+      - "4050:4050"  
+    expose:
+      - 3000
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+    networks:
+      - business-intelligence-net
+## ------------------------------------------- END DASHBOARD SECTION ------------------------------------------
+
+
+## --------------------------------------------- POSTGRES SECTION ---------------------------------------------
+  # Database Container (postgres)
+  postgres:
+    container_name: pg_container4
+    build: ./postgres
+    restart: always
+    environment:
+      POSTGRES_USER: shoc
+      POSTGRES_PASSWORD: JustKeepSwimming
+      POSTGRES_DB: test_db
+      PGAGENT_ENABLED: 'true' # Must be string
+      PGAGENT_USER: pgagent
+      PGAGENT_PASSWORD: secret
+      PGAGENT_DB: pgagent
+      PGAGENT_LOG_LEVEL: 2
+    ports:
+      - "5432:5432"
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+    networks:
+      - business-intelligence-net
+
+  # Container of PGAdmin (web-based admin tool for postgres database)
+  pgadmin:
+    container_name: pg_admin4
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: shoc@shoc.us
+      PGADMIN_DEFAULT_PASSWORD: JustKeepSwimming
+    ports:
+      - "3031:80"
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+    networks:
+      - business-intelligence-net
+## ------------------------------------------- END POSTGRES SECTION ---------------------------------------
+
+## --------------------------------------------- NIFI SECTION ---------------------------------------------
+  nifi:
+    cap_add:
+      - NET_ADMIN # low port bindings
+    image: apache/nifi
+    container_name: nifi
+    ports:
+      - "8080:8080/tcp" # HTTP interface
+      - "8443:8443/tcp" # HTTPS interface
+      - "514:514/tcp" # Syslog
+      - "514:514/udp" # Syslog
+      - "2055:2055/udp" # NetFlow
+    environment:
+      NIFI_WEB_HTTP_PORT: 8443
+    networks:
+      - business-intelligence-net
+      
+#    volumes:
+#      - ./nifi/drivers:/opt/nifi/nifi-current/drivers
+#      - ./nifi/certs:/opt/certs
+#      - ./nifi/conf:/opt/nifi/nifi-current/conf
+    restart: unless-stopped
+## ------------------------------------------- END NIFI SECTION -------------------------------------------
+## --------------------------------------------- SUPERSET SECTION ---------------------------------------------
+  superset:
+    container_name: apache_superset
+    image: apache/superset:latest
+    restart: always
+    ports:
+      - "8088:8088"
+    volumes:
+      - ./superset_config.py:/app/superset_config.py
+    networks:
+      - business-intelligence-net
+    # command: >
+    #   sh -c "superset db upgrade &&
+    #   superset init &&
+    #   superset fab create-admin --username shoc --firstname Superset --lastname Admin --email admin@superset.com --password JustKeepSwimming"
+
+## --------------------------------------------- END SUPERSET SECTION ---------------------------------------------
+## ----------------------------------------- SYSTEM SECTION -----------------------------------------------
+    
+# CADDY is used to have a single sign-on for all of our applications.  Excluding pgAdmin,
+  #   because pgAdmin refuses to play nice.
+  caddy:
+    image: caddy:2.3.0
+    container_name: caddy
+    ports:
+      - "3000:3000"  # Grafana's Port
+    volumes:
+      - ./caddy:/etc/caddy
+    environment:
+      - ADMIN_USER=${ADMIN_USER:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - ADMIN_PASSWORD_HASH=${ADMIN_PASSWORD_HASH:-JDJhJDE0JE91S1FrN0Z0VEsyWmhrQVpON1VzdHVLSDkyWHdsN0xNbEZYdnNIZm1pb2d1blg4Y09mL0ZP}
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+    networks:
+      - business-intelligence-net
+
+## --------------------------------------- END SYSTEM SECTION ----------------------------------
