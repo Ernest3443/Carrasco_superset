@@ -139,6 +139,7 @@ SELECT ((SELECT TO_TIMESTAMP(time) AS timestamp)), value,source
 FROM opensky_age;
 
 Dataset for Plane geographic:
+
 WITH LatestTimestampAdsBX AS (
     SELECT
         MAX(time_return) AS largest_time
@@ -178,4 +179,26 @@ FROM
 JOIN
     LatestTimestampOpenSky l_opensky ON t.time_return = l_opensky.largest_time;
 
-Dataset for 
+Dataset for selected plane:
+
+SELECT *
+FROM adsbx
+WHERE 
+  $__timeFilter(TIMESTAMP 'epoch' + time_return * INTERVAL '1 second')
+AND 
+CASE 
+  WHEN ('$icao' <> '') THEN (icao = '$icao')
+  ELSE 1 = 1           
+END;
+
+SELECT *
+FROM opensky
+WHERE 
+  $__timeFilter(TIMESTAMP 'epoch' + time_return * INTERVAL '1 second')
+AND 
+CASE 
+  WHEN ('$icao' <> '') THEN (icao = '$icao')
+  ELSE 1 = 1           
+END;
+
+
