@@ -1,0 +1,58 @@
+slice_name: Overall Most Current Data By Source
+description: null
+certified_by: null
+certification_details: null
+viz_type: pie
+params:
+  datasource: 5__table
+  viz_type: pie
+  groupby:
+  - source
+  metric:
+    expressionType: SIMPLE
+    column:
+      advanced_data_type: null
+      certification_details: null
+      certified_by: null
+      column_name: count
+      description: null
+      expression: null
+      filterable: true
+      groupby: true
+      id: 7
+      is_certified: false
+      is_dttm: false
+      python_date_format: null
+      type: LONGINTEGER
+      type_generic: 0
+      verbose_name: null
+      warning_markdown: null
+    aggregate: AVG
+    sqlExpression: null
+    datasourceWarning: false
+    hasCustomLabel: false
+    label: AVG(count)
+    optionName: metric_rpm0da1d7n_opkg0zmhz
+  adhoc_filters: []
+  row_limit: 100
+  sort_by_metric: true
+  color_scheme: supersetColors
+  show_labels_threshold: 5
+  show_legend: true
+  legendType: scroll
+  legendOrientation: top
+  label_type: percent
+  number_format: ~g
+  date_format: smart_date
+  show_labels: true
+  labels_outside: true
+  label_line: false
+  outerRadius: 70
+  innerRadius: 30
+  extra_form_data: {}
+  dashboards: []
+query_context: '{"datasource":{"id":5,"type":"table"},"force":false,"queries":[{"filters":[],"extras":{"having":"","where":""},"applied_time_extras":{},"columns":["source"],"metrics":[{"expressionType":"SIMPLE","column":{"advanced_data_type":null,"certification_details":null,"certified_by":null,"column_name":"count","description":null,"expression":null,"filterable":true,"groupby":true,"id":7,"is_certified":false,"is_dttm":false,"python_date_format":null,"type":"LONGINTEGER","type_generic":0,"verbose_name":null,"warning_markdown":null},"aggregate":"AVG","sqlExpression":null,"datasourceWarning":false,"hasCustomLabel":false,"label":"AVG(count)","optionName":"metric_rpm0da1d7n_opkg0zmhz"}],"orderby":[[{"expressionType":"SIMPLE","column":{"advanced_data_type":null,"certification_details":null,"certified_by":null,"column_name":"count","description":null,"expression":null,"filterable":true,"groupby":true,"id":7,"is_certified":false,"is_dttm":false,"python_date_format":null,"type":"LONGINTEGER","type_generic":0,"verbose_name":null,"warning_markdown":null},"aggregate":"AVG","sqlExpression":null,"datasourceWarning":false,"hasCustomLabel":false,"label":"AVG(count)","optionName":"metric_rpm0da1d7n_opkg0zmhz"},false]],"annotation_layers":[],"row_limit":100,"series_limit":0,"order_desc":true,"url_params":{},"custom_params":{},"custom_form_data":{}}],"form_data":{"datasource":"5__table","viz_type":"pie","groupby":["source"],"metric":{"expressionType":"SIMPLE","column":{"advanced_data_type":null,"certification_details":null,"certified_by":null,"column_name":"count","description":null,"expression":null,"filterable":true,"groupby":true,"id":7,"is_certified":false,"is_dttm":false,"python_date_format":null,"type":"LONGINTEGER","type_generic":0,"verbose_name":null,"warning_markdown":null},"aggregate":"AVG","sqlExpression":null,"datasourceWarning":false,"hasCustomLabel":false,"label":"AVG(count)","optionName":"metric_rpm0da1d7n_opkg0zmhz"},"adhoc_filters":[],"row_limit":100,"sort_by_metric":true,"color_scheme":"supersetColors","show_labels_threshold":5,"show_legend":true,"legendType":"scroll","legendOrientation":"top","label_type":"percent","number_format":"~g","date_format":"smart_date","show_labels":true,"labels_outside":true,"label_line":false,"outerRadius":70,"innerRadius":30,"extra_form_data":{},"dashboards":[],"force":false,"result_format":"json","result_type":"full"},"result_format":"json","result_type":"full"}'
+cache_timeout: null
+uuid: 038bfeac-8e73-4277-a211-6cd242856ab7
+version: 1.0.0
+dataset_uuid: 9810471c-0f3b-4979-b6b6-361c6fcc14dc

@@ -1,0 +1,43 @@
+table_name: Open Sky planes tracked
+main_dttm_col: null
+description: null
+default_endpoint: null
+offset: 0
+cache_timeout: null
+schema: null
+sql: "WITH LatestTimestamp AS (\r\n    SELECT\r\n        MAX(time_request) AS largest_time\r\
+  \n    FROM\r\n        opensky\r\n\r\n)\r\nSELECT\r\n    COUNT(*) AS data_count\r\
+  \nFROM\r\n    opensky t\r\nJOIN\r\n    LatestTimestamp l ON t.time_request = l.largest_time;"
+params: null
+template_params: null
+filter_select_enabled: true
+fetch_values_predicate: null
+extra: null
+normalize_columns: false
+always_filter_main_dttm: false
+uuid: 0f689d7b-9fa8-48ef-9daa-1596ce0da3a7
+metrics:
+- metric_name: count
+  verbose_name: COUNT(*)
+  metric_type: count
+  expression: COUNT(*)
+  description: null
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+columns:
+- column_name: data_count
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: LONGINTEGER
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: null
+version: 1.0.0
+database_uuid: 866020ea-1641-415a-bca7-a21c9efb0888
