@@ -1,5 +1,6 @@
 # Carrasco_superset
 Dataset for ADSB-X planes tracked:
+
 WITH LatestTimestamp AS (
     SELECT
         MAX(time_request) AS largest_time
@@ -15,6 +16,7 @@ JOIN
     LatestTimestamp l ON t.time_request = l.largest_time;
     
 Dataset for Open Sky planes tracked:
+
 WITH LatestTimestamp AS (
     SELECT
         MAX(time_request) AS largest_time
@@ -30,6 +32,7 @@ JOIN
     LatestTimestamp l ON t.time_request = l.largest_time;
     
 Create table in pgadmin using query and use it as a dataset for Plane Matches:
+
 create table plane_matches as
 WITH LatestTimestamp AS (
     SELECT
@@ -46,6 +49,7 @@ JOIN
     LatestTimestamp l ON t.time_begin = l.largest_time;
     
 Create table in pgadmin using query and use it it as a dataset for Anomaly Score:
+
 create table anomaly_score as
 WITH LatestTimestamp AS (
     SELECT
@@ -61,24 +65,31 @@ JOIN
 order by t.avg_med_dist_value desc limit 5
 
 Create a table called overall_most with two columns source(text) and count(bigint). Then run these two queries and use it as a dataset for Overall Most Current Data By Source:
+
 INSERT INTO overall_most (source,count)
 VALUES ('adsbx',(SELECT Count(*) as adsbx from merge where first_sys = 'adsbx'));
+
 INSERT INTO overall_most (source,count)
 VALUES ('opensky',(SELECT Count(*) as opensky from merge where first_sys = 'opensky'));
 
 Create a table called data_quality with two columns status(text) and count(bigint). Then run these two queries and use it as a dataset for Data Quality (Success or Error):
+
 INSERT INTO data_quality (status,count)
 VALUES ('Successful Calculations',(SELECT count(*) as "Successful Calculations" FROM merge ));
+
 INSERT INTO data_quality (status,count)
 VALUES ('Errors',(Select Count(*) as "Errors" from flags where reason = 'unequalDatasets'));
 
 Create a table called data_errors with two columns source(text) and count(bigint). Then run these two queries and use it as a dataset for Data Errors By Source:
+
 INSERT INTO data_errors (source,count)
 VALUES ('adsbx',(Select count(*) as "adsbx" from flags where reason = 'unequalDatasets' and system = 'adsbx'));
+
 INSERT INTO data_errors (source,count)
 VALUES ('opensky',(Select count(*) as "opensky" from flags where reason = 'unequalDatasets' and system = 'opensky'));
 
 create a table called adsbx_delay using the create statement below and change the adsbx column's name to 'value'. Add another column named source(text) with a default value of 'adsbx':
+
 create table adsbx_delay as
 SELECT distinct
   time_request as time, 
@@ -86,6 +97,7 @@ SELECT distinct
 FROM adsbx;
 
 create a table called opensky_delay using the create statement below and change the opensky column's name to 'value'. Add another column named source(text) with a default value of 'opensky':
+
 create table opensky_delay as
 SELECT distinct
   time_request as time, 
@@ -93,6 +105,7 @@ SELECT distinct
 FROM opensky;
 
 Dataset for API Call Delay:
+
 SELECT ((SELECT TO_TIMESTAMP(time) AS timestamp)), value,source
 FROM adsbx_delay
 UNION ALL
@@ -100,6 +113,7 @@ SELECT ((SELECT TO_TIMESTAMP(time) AS timestamp)), value,source
 FROM opensky_delay;
 
 create a table called adsbx_age using the create statement below and change the adsbx column's name to 'value'. Add another column named source(text) with a default value of 'adsbx':
+
 create table adsbx_age as
 SELECT distinct
   time_request as time, 
@@ -108,6 +122,7 @@ FROM adsbx
 GROUP BY time_request;
 
 create a table called opensky_age using the create statement below and change the opensky column's name to 'value'. Add another column named source(text) with a default value of 'opensky':
+
 create table opensky_age as
 SELECT distinct
   time_request as time, 
@@ -116,6 +131,7 @@ FROM opensky
 GROUP BY time_request;
 
 Dataset for Age of Data by Source:
+
 SELECT ((SELECT TO_TIMESTAMP(time) AS timestamp)), value,source
 FROM adsbx_age
 UNION ALL
