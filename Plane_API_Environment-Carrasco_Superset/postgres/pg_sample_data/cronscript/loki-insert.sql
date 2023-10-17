@@ -1,0 +1,1 @@
+INSERT INTO public.loki_injest(	imported) select replace(replace(replace(replace(substring(py_pgrest('http://loki:3100/loki/api/v1/query_range', 'query={container_name=~"shoc_log_gen_.+"}'), 2), '\\n', ''), '\\u001b[32m', ''), '\\"', '\"'), '\n', '') as imported;

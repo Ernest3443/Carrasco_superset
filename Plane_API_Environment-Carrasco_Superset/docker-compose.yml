@@ -43,7 +43,7 @@ services:
 ## --------------------------------------------- POSTGRES SECTION ---------------------------------------------
   # Database Container (postgres)
   postgres:
-    container_name: pg_container4
+    container_name: pg_container
     build: ./postgres
     restart: always
     environment:

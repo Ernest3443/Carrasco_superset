@@ -1,0 +1,7 @@
+https://nextcloud.shoc.us/s/cz8SLKWYAfk9apa/download/001_SISO.sql 
+https://nextcloud.shoc.us/s/NQKy2x2sCtj6f9e/download/002_MEPED.sql 
+https://nextcloud.shoc.us/s/XroWygfKeFkwFFa/download/003_t_oil.sql 
+https://nextcloud.shoc.us/s/ERqt2Dy9RsPCpwY/download/004_Meteorite_Landings.sql 
+https://nextcloud.shoc.us/s/85rH3frrELjW3gq/download/005_Near-Earth_Comets_-_Orbital_Elements.sql 
+https://nextcloud.shoc.us/s/2JPt7K4Pjx6wFeN/download/006_Extra-vehicular_Activity__EVA__-_US_and_Russia.sql 
+https://nextcloud.shoc.us/s/K4EMtQ9RKkg8wwe/download/007-brfss_prevalence_data.sql
