@@ -119,36 +119,33 @@ where reason = 'unequalDatasets' and system = 'opensky'
 Create view api_delay and use it as dataset for API Call Delay:
 
 CREATE view api_delay AS
-SELECT distinct
-     time_request as time,
-	 time_return - time_request as value,
-	 'adsbx' as source
-FROM adsbx
-UNION ALL
-SELECT
-    time_request as time,
-	 time_return - time_request as value,
-	 'opensky' as source
-FROM opensky
+SELECT DISTINCT adsbx.time_request AS "time",
+    adsbx.time_return - adsbx.time_request AS adsbx,
+    opensky.time_return - opensky.time_request AS opensky
+   FROM adsbx
+     JOIN opensky ON adsbx.time_request = opensky.time_request;
 
 
 
 Create a view called age_data and use it as dataset for Age of Data by Source:
 
 CREATE view age_data AS
-SELECT distinct
-     time_request as time,
-	 (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY (time_return - time_reported_by_source))) as value,
-	 'adsbx' as source
-FROM adsbx
-GROUP BY time_request
-UNION ALL
-SELECT
-    time_request as time,
-	 (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY (time_return - time_reported_by_source))) as value,
-	 'opensky' as source
-FROM opensky
-GROUP BY time_request
+WITH adsbx_cte AS (
+         SELECT adsbx.time_request AS "time",
+            percentile_cont(0.5::double precision) WITHIN GROUP (ORDER BY (adsbx.time_return - adsbx.time_reported_by_source)) AS adsbx
+           FROM adsbx
+          GROUP BY adsbx.time_request
+        ), opensky_cte AS (
+         SELECT opensky.time_request AS "time",
+            percentile_cont(0.5::double precision) WITHIN GROUP (ORDER BY (opensky.time_return - opensky.time_reported_by_source)) AS opensky
+           FROM opensky
+          GROUP BY opensky.time_request
+        )
+ SELECT adsbx_cte."time",
+    adsbx_cte.adsbx,
+    opensky_cte.opensky
+   FROM adsbx_cte
+     JOIN opensky_cte ON adsbx_cte."time" = opensky_cte."time";
 
 
 Dataset for Plane geographic:
