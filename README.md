@@ -116,9 +116,9 @@ where reason = 'unequalDatasets' and system = 'opensky'
 
 
 
-Create view api_delay and use it as dataset for API Call Delay:
+Create view api_delay1 and use it as dataset for API Call Delay:
 
-CREATE view api_delay AS
+CREATE view api_delay1 AS
 SELECT DISTINCT adsbx.time_request AS "time",
     adsbx.time_return - adsbx.time_request AS adsbx,
     opensky.time_return - opensky.time_request AS opensky
@@ -127,9 +127,9 @@ SELECT DISTINCT adsbx.time_request AS "time",
 
 
 
-Create a view called age_data and use it as dataset for Age of Data by Source:
+Create a view called age_data1 and use it as dataset for Age of Data by Source:
 
-CREATE view age_data AS
+CREATE view age_data1 AS
 WITH adsbx_cte AS (
          SELECT adsbx.time_request AS "time",
             percentile_cont(0.5::double precision) WITHIN GROUP (ORDER BY (adsbx.time_return - adsbx.time_reported_by_source)) AS adsbx
