@@ -98,17 +98,13 @@ WHERE reason = 'unequalDatasets';
 Create a view called data_errors using the query below and use it as a dataset for Data Errors By Source:
 
 CREATE VIEW data_errors AS
-SELECT
-    'adsbx' AS source,
-    COUNT(*) AS count
+SELECT 'adsbx' AS source, COUNT(*) AS count
 FROM flags
-where reason = 'unequalDatasets' and system = 'adsbx'
+WHERE reason = 'unequalDatasets' AND system = 'adsbx'
 UNION ALL
-SELECT
-    'opensky' AS source,
-    COUNT(*) AS count
+SELECT 'opensky' AS source, COUNT(*) AS count
 FROM flags
-where reason = 'unequalDatasets' and system = 'opensky'
+WHERE reason = 'unequalDatasets' AND system = 'opensky';
 
 
 
