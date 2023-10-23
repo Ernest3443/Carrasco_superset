@@ -86,17 +86,13 @@ GROUP BY system_name;
 
 Create a view called data_quality using the query below and use it as a dataset for Data Quality (Success or Error):
 
-CREATE data_quality AS
-SELECT
-    'Successful Calculations' AS status,
-    COUNT(*) AS count
+CREATE VIEW data_quality AS
+SELECT 'Successful Calculations' AS status, COUNT(*) AS count
 FROM merge
 UNION ALL
-SELECT
-    'Errors' AS status,
-    COUNT(*) AS count
+SELECT 'Errors' AS status, COUNT(*) AS count
 FROM flags
-where reason = 'unequalDatasets'
+WHERE reason = 'unequalDatasets';
 
 
 Create a view called data_errors using the query below and use it as a dataset for Data Errors By Source:
