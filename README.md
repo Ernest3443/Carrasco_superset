@@ -69,20 +69,20 @@ Create a view called overall_most using the query below and use it as the datase
 
 CREATE view overall_most AS
 SELECT
-    'adsbx' AS system_name,
+    'adsbx' AS source,
     COUNT(*) AS count
 FROM merge
 WHERE first_sys = 'adsbx'
-GROUP BY system_name
+GROUP BY source
 
 UNION ALL
 
 SELECT
-    'opensky' AS system_name,
+    'opensky' AS source,
     COUNT(*) AS count
 FROM merge
 WHERE first_sys = 'opensky'
-GROUP BY system_name;
+GROUP BY source;
 
 Create a view called data_quality using the query below and use it as a dataset for Data Quality (Success or Error):
 
