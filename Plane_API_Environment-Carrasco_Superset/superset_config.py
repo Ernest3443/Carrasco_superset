@@ -7,4 +7,9 @@ utilize the map visualizations inside Superset. Otherwise, you will just have bl
 SECRET_KEY = 'jnDid1WMi1TrCtCwptkiiakZOFAonkKZAS47ej+scFrDKqDvPXf+eAKB'
 MAPBOX_API_KEY = 'pk.eyJ1IjoiZXJuZXN0MzQ0MyIsImEiOiJjbG5tNnhiYjAyNG52Mm5wZWc2a2dtcXhqIn0.a5EsNac0sG2GS25SLl1XYA'
 MAPBOX_MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+FEATURE_FLAGS = {
+    'HORIZONTAL_FILTER_BAR':True,
+    "ALERT_REPORTS": True, 
+    "ENABLE_JAVASCRIPT_CONTROLS":True
 
+}
