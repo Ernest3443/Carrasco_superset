@@ -69,56 +69,48 @@ Create a view called overall_most using the query below and use it as the datase
 
 CREATE view overall_most AS
 SELECT
-    'adsbx' AS system_name,
+    'adsbx' AS source,
     COUNT(*) AS count
 FROM merge
 WHERE first_sys = 'adsbx'
-GROUP BY system_name
+GROUP BY source
 
 UNION ALL
 
 SELECT
-    'opensky' AS system_name,
+    'opensky' AS source,
     COUNT(*) AS count
 FROM merge
 WHERE first_sys = 'opensky'
-GROUP BY system_name;
+GROUP BY source;
 
 Create a view called data_quality using the query below and use it as a dataset for Data Quality (Success or Error):
 
-CREATE data_quality AS
-SELECT
-    'Successful Calculations' AS status,
-    COUNT(*) AS count
+CREATE VIEW data_quality AS
+SELECT 'Successful Calculations' AS status, COUNT(*) AS count
 FROM merge
 UNION ALL
-SELECT
-    'Errors' AS status,
-    COUNT(*) AS count
+SELECT 'Errors' AS status, COUNT(*) AS count
 FROM flags
-where reason = 'unequalDatasets'
+WHERE reason = 'unequalDatasets';
 
 
 Create a view called data_errors using the query below and use it as a dataset for Data Errors By Source:
 
 CREATE VIEW data_errors AS
-SELECT
-    'adsbx' AS source,
-    COUNT(*) AS count
+SELECT 'adsbx' AS source, COUNT(*) AS count
 FROM flags
-where reason = 'unequalDatasets' and system = 'adsbx'
+WHERE reason = 'unequalDatasets' AND system = 'adsbx'
 UNION ALL
-SELECT
-    'opensky' AS source,
-    COUNT(*) AS count
+SELECT 'opensky' AS source, COUNT(*) AS count
 FROM flags
-where reason = 'unequalDatasets' and system = 'opensky'
+WHERE reason = 'unequalDatasets' AND system = 'opensky';
 
 
 
-Create view api_delay and use it as dataset for API Call Delay:
+Create view api_delay1 and use it as dataset for API Call Delay:
 
-CREATE view api_delay AS
+CREATE view api_delay1 AS
 SELECT DISTINCT adsbx.time_request AS "time",
     adsbx.time_return - adsbx.time_request AS adsbx,
     opensky.time_return - opensky.time_request AS opensky
@@ -127,9 +119,9 @@ SELECT DISTINCT adsbx.time_request AS "time",
 
 
 
-Create a view called age_data and use it as dataset for Age of Data by Source:
+Create a view called age_data1 and use it as dataset for Age of Data by Source:
 
-CREATE view age_data AS
+CREATE view age_data1 AS
 WITH adsbx_cte AS (
          SELECT adsbx.time_request AS "time",
             percentile_cont(0.5::double precision) WITHIN GROUP (ORDER BY (adsbx.time_return - adsbx.time_reported_by_source)) AS adsbx
@@ -191,24 +183,17 @@ JOIN
 
 Dataset for selected plane:
 
-SELECT *
-FROM adsbx
-WHERE 
-  $__timeFilter(TIMESTAMP 'epoch' + time_return * INTERVAL '1 second')
-AND 
-CASE 
-  WHEN ('$icao' <> '') THEN (icao = '$icao')
-  ELSE 1 = 1           
-END;
+create view selected_plane as
+select icao, lat,lon,track,time_request,time_return, time_reported_by_source,'opensky'::text as source 
+from opensky
+union all
+select icao, lat,lon,track,time_request,time_return, time_reported_by_source,'adsbx'::text as source 
+from adsbx
 
 SELECT *
-FROM opensky
-WHERE 
-  $__timeFilter(TIMESTAMP 'epoch' + time_return * INTERVAL '1 second')
-AND 
-CASE 
-  WHEN ('$icao' <> '') THEN (icao = '$icao')
-  ELSE 1 = 1           
-END;
+FROM public.selected_plane
+WHERE TO_TIMESTAMP(time_reported_by_source) >= CURRENT_TIMESTAMP - INTERVAL '5 minutes';
+
+
 
 
