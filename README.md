@@ -183,24 +183,17 @@ JOIN
 
 Dataset for selected plane:
 
-SELECT *
-FROM adsbx
-WHERE 
-  $__timeFilter(TIMESTAMP 'epoch' + time_return * INTERVAL '1 second')
-AND 
-CASE 
-  WHEN ('$icao' <> '') THEN (icao = '$icao')
-  ELSE 1 = 1           
-END;
+create view selected_plane as
+select icao, lat,lon,track,time_request,time_return, time_reported_by_source,'opensky'::text as source 
+from opensky
+union all
+select icao, lat,lon,track,time_request,time_return, time_reported_by_source,'adsbx'::text as source 
+from adsbx
 
 SELECT *
-FROM opensky
-WHERE 
-  $__timeFilter(TIMESTAMP 'epoch' + time_return * INTERVAL '1 second')
-AND 
-CASE 
-  WHEN ('$icao' <> '') THEN (icao = '$icao')
-  ELSE 1 = 1           
-END;
+FROM public.selected_plane
+WHERE TO_TIMESTAMP(time_reported_by_source) >= CURRENT_TIMESTAMP - INTERVAL '5 minutes';
+
+
 
 
