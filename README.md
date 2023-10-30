@@ -1,38 +1,9 @@
-# Carrasco_superset
-Dataset for ADSB-X planes tracked:
-
-WITH LatestTimestamp AS (
-    SELECT
-        MAX(time_request) AS largest_time
-    FROM
-        adsbx
-   
-)
-SELECT
-    COUNT(*) AS data_count
-FROM
-    adsbx t
-JOIN
-    LatestTimestamp l ON t.time_request = l.largest_time;
+# Postgres Environment set up
+## View configuration 
     
-Dataset for Open Sky planes tracked:
-
-WITH LatestTimestamp AS (
-    SELECT
-        MAX(time_request) AS largest_time
-    FROM
-        opensky
-
-)
-SELECT
-    COUNT(*) AS data_count
-FROM
-    opensky t
-JOIN
-    LatestTimestamp l ON t.time_request = l.largest_time;
-    
-Create view in pgadmin using query and use it as a dataset for Plane Matches:
-
+Plane Matches
+- contains data from plane matches vizualization
+```SQL
 CREATE VIEW plane_matches AS
 WITH LatestTimestamp AS (
     SELECT
@@ -47,10 +18,11 @@ FROM
     merge t
 JOIN
     LatestTimestamp l ON t.time_begin = l.largest_time;
+```
 
-    
-Create view in pgadmin using query and use it it as a dataset for Anomaly Score:
-
+Anomaly Score
+- contains data from anomaly score vizualization
+```SQL
 create view anomaly_score as
 WITH LatestTimestamp AS (
     SELECT
@@ -64,9 +36,11 @@ FROM merge t
 JOIN
     LatestTimestamp l ON t.time_begin = l.largest_time
 order by t.avg_med_dist_value desc limit 5
+```
 
-Create a view called overall_most using the query below and use it as the dataset for Overall Most Current Data By Source:
-
+Overall Most Current Data By Source
+- contains data from overall most current data by source vizualization
+```SQL
 CREATE view overall_most AS
 SELECT
     'adsbx' AS source,
@@ -83,9 +57,10 @@ SELECT
 FROM merge
 WHERE first_sys = 'opensky'
 GROUP BY source;
-
-Create a view called data_quality using the query below and use it as a dataset for Data Quality (Success or Error):
-
+```
+Data Quality (Success or Error)
+- contains data from data quality vizualization
+```SQL
 CREATE VIEW data_quality AS
 SELECT 'Successful Calculations' AS status, COUNT(*) AS count
 FROM merge
@@ -93,10 +68,11 @@ UNION ALL
 SELECT 'Errors' AS status, COUNT(*) AS count
 FROM flags
 WHERE reason = 'unequalDatasets';
+```
 
-
-Create a view called data_errors using the query below and use it as a dataset for Data Errors By Source:
-
+Data Errors By Source
+- contains data from data errors by source vizualization
+```SQL
 CREATE VIEW data_errors AS
 SELECT 'adsbx' AS source, COUNT(*) AS count
 FROM flags
@@ -105,22 +81,21 @@ UNION ALL
 SELECT 'opensky' AS source, COUNT(*) AS count
 FROM flags
 WHERE reason = 'unequalDatasets' AND system = 'opensky';
-
-
-
-Create view api_delay1 and use it as dataset for API Call Delay:
-
+```
+API Call Delay
+- contains data from api call delay vizualization
+```SQL
 CREATE view api_delay1 AS
 SELECT DISTINCT adsbx.time_request AS "time",
     adsbx.time_return - adsbx.time_request AS adsbx,
     opensky.time_return - opensky.time_request AS opensky
    FROM adsbx
      JOIN opensky ON adsbx.time_request = opensky.time_request;
+```
 
-
-
-Create a view called age_data1 and use it as dataset for Age of Data by Source:
-
+Age of Data by Source
+- contains data from age of data by source vizualization
+```SQL
 CREATE view age_data1 AS
 WITH adsbx_cte AS (
          SELECT adsbx.time_request AS "time",
@@ -138,61 +113,20 @@ WITH adsbx_cte AS (
     opensky_cte.opensky
    FROM adsbx_cte
      JOIN opensky_cte ON adsbx_cte."time" = opensky_cte."time";
+```
 
 
-Dataset for Plane geographic:
-
-WITH LatestTimestampAdsBX AS (
-    SELECT
-        MAX(time_return) AS largest_time
-    FROM
-        adsbx
-),
-LatestTimestampOpenSky AS (
-    SELECT
-        MAX(time_return) AS largest_time
-    FROM
-        opensky
-
-)
-SELECT
-    t.icao,
-    l_adsbx.largest_time,
-    t.lat,
-    t.lon,
-    t.track,
-    'adsbx' as source
-FROM
-    adsbx t
-JOIN
-    LatestTimestampAdsBX l_adsbx ON t.time_return = l_adsbx.largest_time
-
-UNION ALL
-
-SELECT
-    t.icao,
-    l_opensky.largest_time,
-    t.lat,
-    t.lon,
-    t.track,
-    'opensky' as source
-FROM
-    opensky t
-JOIN
-    LatestTimestampOpenSky l_opensky ON t.time_return = l_opensky.largest_time;
-
-Dataset for selected plane:
-
+Selected Plane
+- contains data from selected plane vizualization
+``` SQl
 create view selected_plane as
 select icao, lat,lon,track,time_request,time_return, time_reported_by_source,'opensky'::text as source 
 from opensky
 union all
 select icao, lat,lon,track,time_request,time_return, time_reported_by_source,'adsbx'::text as source 
 from adsbx
+```
 
-SELECT *
-FROM public.selected_plane
-WHERE TO_TIMESTAMP(time_reported_by_source) >= CURRENT_TIMESTAMP - INTERVAL '5 minutes';
 
 
 
